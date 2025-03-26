@@ -11,22 +11,24 @@ struct ChillView: View {
     let sound = "rain music"
     let type = "mp4"
     @State private var currentImageIndex: Int = 0
-    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    let timer = Timer.publish(every: 10, on: .main, in: .common).autoconnect()
     
     var body: some View {
         let image = imageData[currentImageIndex]
-        ZStack {
-            
-            Image(image.imageName)
-                .resizable()
-                .scaledToFill()
-                .ignoresSafeArea()
-                
-            Text("Photo by \(image.photographer)")
-                .padding()
-                .onReceive(timer) { _ in
-                    currentImageIndex = nextIndex(index:currentImageIndex)
-                }
+        I_mageAndPhotographerView(
+            imageName: image.imageName,
+            photographer: image.photographer,
+            photographer_url: image.photographer_url
+        )
+        .animation(.easeOut, value: currentImageIndex)
+        .onReceive(timer) { _ in
+            currentImageIndex = nextIndex(index: currentImageIndex)
+        }
+        .onTapGesture {
+            currentImageIndex = nextIndex(index: currentImageIndex)
+        }
+        .onAppear {
+            playSound(sound: sound, type: type)
         }
     }
     func nextIndex(index: Int) -> Int {
